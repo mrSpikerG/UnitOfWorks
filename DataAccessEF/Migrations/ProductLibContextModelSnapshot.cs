@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccessEF.Migrations
 {
-    [DbContext(typeof(ProductLibContext))]
+    [DbContext(typeof(ShopContext))]
     partial class ProductLibContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

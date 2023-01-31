@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace DataAccessEF.Migrations
 {
-    [DbContext(typeof(ProductLibContext))]
+    [DbContext(typeof(ShopContext))]
     [Migration("20230123175808_m1")]
     partial class m1
     {
