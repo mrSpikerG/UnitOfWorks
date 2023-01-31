@@ -4,6 +4,7 @@ using DataAccessEF;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DataAccessEF.Migrations
 {
     [DbContext(typeof(ShopContext))]
-    partial class ProductLibContextModelSnapshot : ModelSnapshot
+    [Migration("20230131153224_m2")]
+    partial class m2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,12 +33,6 @@ namespace DataAccessEF.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Image")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .IsUnicode(true)
-                        .HasColumnType("nvarchar(1000)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -45,6 +42,75 @@ namespace DataAccessEF.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Category", (string)null);
+                });
+
+            modelBuilder.Entity("DataAccessEF.CategoryConnection", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("PhoneId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CategoryConnection", (string)null);
+                });
+
+            modelBuilder.Entity("DataAccessEF.ShopItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<decimal?>("Price")
+                        .HasColumnType("money");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ShopItem", (string)null);
+                });
+
+            modelBuilder.Entity("DataAccessEF.UserInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ApiKey")
+                        .HasMaxLength(500)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.Property<string>("Password")
+                        .HasMaxLength(100)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("Id")
+                        .HasName("PK__UserInfo__3214EC07DDBE17BA");
+
+                    b.ToTable("UserInfo", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

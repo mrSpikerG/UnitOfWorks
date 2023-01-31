@@ -12,7 +12,6 @@ namespace Domain.Models {
         [Required(ErrorMessage = "User name is  Required! ")]
         public string? UserName { get; set; }
         
-        [JsonIgnore]
         [Required(ErrorMessage = "User password is  Required! ")]
         public string? Password { get; set; }
 

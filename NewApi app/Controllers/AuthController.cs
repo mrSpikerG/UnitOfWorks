@@ -28,7 +28,7 @@ namespace NewApi_app.Controllers {
 
         [HttpPost]
         [Route("login")]
-        public async Task<IActionResult> Login([FromBody] Login model) {
+        public async Task<IActionResult> Login([FromQuery] Login model) {
             var user = await this._userManager.FindByNameAsync(model.UserName);
             var d = this._userManager.CheckPasswordAsync(user, model.Password);
             if (user != null && await this._userManager.CheckPasswordAsync(user, model.Password)) {
@@ -42,7 +42,7 @@ namespace NewApi_app.Controllers {
                     authClaims.Add(new Claim(ClaimTypes.Role, role));
                 }
 
-                var token = AuthHelper.GetToken(authClaims,this._configuration);
+                var token = AuthHelper.GetToken(authClaims, this._configuration);
 
                 return Ok(new {
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
@@ -57,7 +57,7 @@ namespace NewApi_app.Controllers {
 
         [HttpPost]
         [Route("regUser")]
-        public async Task<IActionResult> RegUser([FromBody] Register model) {
+        public async Task<IActionResult> RegUser([FromQuery] Register model) {
             var userEx = await this._userManager.FindByNameAsync(model.UserName);
             if (userEx != null)
                 return StatusCode(StatusCodes.Status500InternalServerError, "User in db already");
@@ -69,7 +69,7 @@ namespace NewApi_app.Controllers {
             };
 
             var res = await this._userManager.CreateAsync(user, model.Password);
-            if (!res.Succeeded) { return StatusCode(StatusCodes.Status500InternalServerError, "Creation failed!"); }
+            if (!res.Succeeded) { return StatusCode(StatusCodes.Status500InternalServerError, res.Errors); }
 
             return Ok("User added!");
         }
@@ -77,10 +77,25 @@ namespace NewApi_app.Controllers {
 
 
         [HttpPost]
+        [Route("checkManagerAccess")]
+        [Authorize(Roles = UserRoles.Manager)]
+        public async Task<IActionResult> CheckManagerAccess() {
+            return Ok();
+        }
+
+
+        [HttpPost]
+        [Route("checkAdminAccess")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> CheckAdminAccess() {
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("setAdmin")]
-        [Authorize(Roles = UserRoles.Admin)] 
-        public async Task<IActionResult> SetRole([FromBody] string username, string role) {
-           
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> SetRole(string username, string role) {
+
             var user = await _userManager.FindByNameAsync(username);
             if (user != null) {
 

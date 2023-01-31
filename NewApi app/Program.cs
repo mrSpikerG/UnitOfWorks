@@ -14,9 +14,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ShopContext>(x => {
-    x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn"), b => b.MigrationsAssembly(typeof(ShopContext).Assembly.FullName));
-   
-    });
+    x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn"), b => b.MigrationsAssembly(typeof(ShopContext).Assembly.FullName));});
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ShopContext>()
@@ -55,8 +53,20 @@ if (app.Environment.IsDevelopment()) {
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
 app.Run();
+
+
+
+
+
+
+
+//
+// Супер секретное место хранение данных от админ аккаунта
+//  admin
+//  Admin22-
