@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 namespace DataAccessEF {
     public class UnitOfWorks : IUnitOfWorks, IDisposable {
         public ICategoryRepository Category { get; set; }
+        public ICategoryConnectionRepository CategoryConnection { get; set; }
         public IProductRepository Product { get; set; }
 
 
@@ -17,6 +18,7 @@ namespace DataAccessEF {
         public UnitOfWorks(ShopContext context) {
             this.Category = new CategoryRepository(context);
             this.Product = new ProductRepository(context);
+            this.CategoryConnection = new CategoryConnectionRepository(context);
         }
 
         public void Commit() {

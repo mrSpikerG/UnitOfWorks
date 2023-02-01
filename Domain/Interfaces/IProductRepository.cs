@@ -7,5 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces {
     public interface IProductRepository :IGenericRepoitory<ShopItem>{
+        int GetPages(int count,int categoryId);
+        IEnumerable<ShopItem> GetItems(int page, int count, int categoryId);
     }
 }

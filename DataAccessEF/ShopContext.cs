@@ -15,12 +15,12 @@ public partial class ShopContext : IdentityDbContext<IdentityUser> {
 
     public virtual DbSet<Category> Categories { get; set; }
 
-    //public virtual DbSet<CategoryConnection> CategoryConnections { get; set; }
+    public virtual DbSet<CategoryConnection> CategoryConnections { get; set; }
 
-    //public virtual DbSet<ShopItem> ShopItems { get; set; }
+    public virtual DbSet<ShopItem> ShopItems { get; set; }
 
-   
-   
+
+
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Category>(entity =>
@@ -35,23 +35,24 @@ public partial class ShopContext : IdentityDbContext<IdentityUser> {
                 .IsUnicode(true);
         });
 
-        //modelBuilder.Entity<CategoryConnection>(entity =>
-        //{
-        //    entity.ToTable("CategoryConnection");
-        //});
+        modelBuilder.Entity<CategoryConnection>(entity => {
+            entity.ToTable("CategoryConnection");
+        });
 
 
-        //modelBuilder.Entity<ShopItem>(entity =>
-        //{
-        //    entity.ToTable("ShopItem");
+        modelBuilder.Entity<ShopItem>(entity => {
+            entity.ToTable("ShopItem");
+            entity.Property(e => e.Image)
+               .HasMaxLength(1000)
+               .IsUnicode(true);
 
-        //    entity.Property(e => e.Name)
-        //        .HasMaxLength(100)
-        //        .IsUnicode(false);
-        //    entity.Property(e => e.Price).HasColumnType("money");
-        //});
+            entity.Property(e => e.Name)
+                .HasMaxLength(100)
+                .IsUnicode(false);
+            entity.Property(e => e.Price).HasColumnType("money");
+        });
 
-       
+
 
         OnModelCreatingPartial(modelBuilder);
     }
