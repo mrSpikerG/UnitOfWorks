@@ -20,16 +20,5 @@ namespace NewApi_app.Helpers {
 
             return token;
         }
-
-        internal async static void CheckIfRolesExist(RoleManager<IdentityRole> _roleManager) {
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
-
-            if (!await _roleManager.RoleExistsAsync(UserRoles.Manager))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.Manager));
-
-            if (!await _roleManager.RoleExistsAsync(UserRoles.User))
-                await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
-        }
     }
 }

@@ -21,6 +21,10 @@ namespace NewApi_app.Properties {
             return Ok(this.Unit.Product.Get());
         }
 
+        [HttpGet]
+        public IActionResult GetCategory(int id) {
+            return Ok(this.Unit.CategoryConnection.GetCategoryByProduct(id));
+        }
 
         [HttpGet]
         public IActionResult GetByPage(int page,int count,int categoryId) {

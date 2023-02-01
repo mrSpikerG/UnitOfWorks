@@ -1,4 +1,5 @@
-﻿using DataAccessEF;
+﻿using Azure.Core;
+using DataAccessEF;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,8 +29,8 @@ namespace NewApi_app.Controllers {
 
         [HttpPost]
         [Authorize(Roles =UserRoles.Manager)]
-        public IActionResult Insert(Category category) {
-            this.Unit.Category.Insert(category);
+        public IActionResult Insert(string name,string image) {
+            this.Unit.Category.Insert(new Category() {Image=image,Name=name });
             return Ok();
         }
 
@@ -42,9 +43,14 @@ namespace NewApi_app.Controllers {
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Manager)]
-        public IActionResult Delete(Category category) {
-            this.Unit.Category.Delete(category);
-            return Ok();
+        public IActionResult Delete(int id) {
+            try {
+                this.Unit.Category.Delete(this.Unit.Category.FindById(id));
+
+                return Ok();
+            }catch {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
         }
 
 

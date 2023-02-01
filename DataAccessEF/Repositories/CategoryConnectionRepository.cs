@@ -9,5 +9,9 @@ namespace DataAccessEF.Repositories {
     public class CategoryConnectionRepository : GenericRepository<CategoryConnection>, ICategoryConnectionRepository {
         public CategoryConnectionRepository(ShopContext context) : base(context) {
         }
+
+        public int GetCategoryByProduct(int id) {
+            return this.Set.FirstOrDefault(x => x.PhoneId == id).CategoryId;
+        }
     }
 }

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace Domain.Interfaces {
     public interface ICategoryRepository : IGenericRepoitory<Category> {
 
+       
         public Category GetMostPopular();
     }
 }

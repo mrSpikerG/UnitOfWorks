@@ -7,5 +7,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces {
     public interface ICategoryConnectionRepository : IGenericRepoitory<CategoryConnection> {
+
+        int GetCategoryByProduct(int id);
     }
 }

@@ -71,9 +71,35 @@ namespace NewApi_app.Controllers {
             var res = await this._userManager.CreateAsync(user, model.Password);
             if (!res.Succeeded) { return StatusCode(StatusCodes.Status500InternalServerError, res.Errors); }
 
+            this.SetRole(model.UserName, UserRoles.User);
             return Ok("User added!");
         }
 
+        [HttpPost]
+        [Route("setAdmin")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> SetRole(string username, string role) {
+
+            var user = await _userManager.FindByNameAsync(username);
+            if (user != null) {
+
+                if (!await _roleManager.RoleExistsAsync(UserRoles.Admin))
+                    await _roleManager.CreateAsync(new IdentityRole(UserRoles.Admin));
+
+                if (!await _roleManager.RoleExistsAsync(UserRoles.Manager))
+                    await _roleManager.CreateAsync(new IdentityRole(UserRoles.Manager));
+
+                if (!await _roleManager.RoleExistsAsync(UserRoles.User))
+                    await _roleManager.CreateAsync(new IdentityRole(UserRoles.User));
+
+
+                if (await this._roleManager.RoleExistsAsync(role))
+                    await this._userManager.AddToRoleAsync(user, role);
+
+                return Ok("Role added!");
+            }
+            return StatusCode(404);
+        }
 
 
         [HttpPost]
@@ -91,22 +117,6 @@ namespace NewApi_app.Controllers {
             return Ok();
         }
 
-        [HttpPost]
-        [Route("setAdmin")]
-        [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> SetRole(string username, string role) {
-
-            var user = await _userManager.FindByNameAsync(username);
-            if (user != null) {
-
-                AuthHelper.CheckIfRolesExist(this._roleManager);
-
-                if (await this._roleManager.RoleExistsAsync(role))
-                    await this._userManager.AddToRoleAsync(user, role);
-
-                return Ok("Admin added!");
-            }
-            return StatusCode(404);
-        }
+        
     }
 }
