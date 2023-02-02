@@ -1,8 +1,10 @@
 using DataAccessEF;
+
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using NewApi_app.Cache;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -19,6 +21,10 @@ builder.Services.AddDbContext<ShopContext>(x => {
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ShopContext>()
     .AddDefaultTokenProviders();
+
+//          CacheService
+builder.Services.AddScoped<ICacheService, CacheService>();
+// ...
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

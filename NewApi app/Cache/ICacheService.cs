@@ -1,0 +1,8 @@
+﻿using System.Data;
+
+namespace NewApi_app.Cache {
+    public interface ICacheService {
+        T GetData<T>(string key);
+        bool SetData<T>(string key, T value, DateTimeOffset dateTimeOffset);
+    }
+}
