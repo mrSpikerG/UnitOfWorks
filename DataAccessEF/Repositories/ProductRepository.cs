@@ -36,7 +36,10 @@ namespace DataAccessEF.Repositories {
             return paginated;
 
         }
-           
+
+        public int GetLastByName(string name) {
+            return this.Set.ToList().Last(x => x.Name.Equals(name)).Id;
+        }
 
         public int GetPages(int count, int categoryId) {
             int items = this._context.CategoryConnections.Where(x => x.CategoryId == categoryId).Count();

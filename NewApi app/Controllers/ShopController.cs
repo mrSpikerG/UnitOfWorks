@@ -46,9 +46,18 @@ namespace NewApi_app.Properties {
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Manager)]
-        public IActionResult Insert(ShopItem item) {
-            this.Unit.Product.Insert(item);
-            return Ok();
+        public IActionResult Insert(string name,string image,decimal price,int categoryId) {
+
+            try {
+                if (this.Unit.Category.FindById(categoryId) == null) {
+                    return StatusCode(StatusCodes.Status400BadRequest);
+                }
+                this.Unit.Product.Insert(new ShopItem() { Name = name,Image = image,Price=price});
+                this.Unit.CategoryConnection.Insert(new CategoryConnection() { PhoneId = this.Unit.Product.GetLastByName(name), CategoryId = categoryId });
+                return Ok();
+            } catch {
+                return StatusCode(StatusCodes.Status400BadRequest);
+            }
         }
 
         [HttpPost]
@@ -60,8 +69,8 @@ namespace NewApi_app.Properties {
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Manager)]
-        public IActionResult Delete(ShopItem item) {
-            this.Unit.Product.Delete(item);
+        public IActionResult Delete(int id) {
+            this.Unit.Product.Delete(this.Unit.Product.FindById(id));
             return Ok();
         }
         

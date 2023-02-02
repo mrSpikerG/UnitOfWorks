@@ -52,8 +52,5 @@ namespace NewApi_app.Controllers {
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
         }
-
-
-
     }
 }
