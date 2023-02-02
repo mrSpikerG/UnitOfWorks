@@ -57,17 +57,8 @@ namespace NewApi_app.Properties {
                 return StatusCode(StatusCodes.Status400BadRequest);
             }
 
-            try {
-                List<ShopItem> productsCache = _cacheService.GetData<List<ShopItem>>("ShopItemByPage");
-                if (productsCache == null) {
-                    var productSQL = this.Unit.Product.GetItems(page - 1, count, categoryId, minCost, maxCost);
-                    _cacheService.SetData("ShopItemByPage", productSQL, DateTimeOffset.Now.AddMinutes(5));
-                }
-                return Ok(productsCache);
-            } catch {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-            return StatusCode(StatusCodes.Status400BadRequest);
+
+            return Ok(this.Unit.Product.GetItems(page - 1, count, categoryId, minCost, maxCost));
         }
 
         [HttpGet]

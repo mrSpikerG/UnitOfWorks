@@ -4,6 +4,7 @@ using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NewApi_app.Cache;
 using System.Linq;
 
 namespace NewApi_app.Controllers {
@@ -13,13 +14,26 @@ namespace NewApi_app.Controllers {
     public class CategoryController : Controller {
 
         private UnitOfWorks Unit;
-        public CategoryController(ShopContext context) {
+        private readonly ICacheService _cacheService;
+        public CategoryController(ShopContext context, ICacheService cacheService) {
             this.Unit = new UnitOfWorks(context);
+            this._cacheService = cacheService;
         }
 
         [HttpGet]
         public IActionResult Get() {
-            return Ok(this.Unit.Category.Get());
+            try {
+                List<Category> productsCache = _cacheService.GetData<List<Category>>("Category");
+                if (productsCache == null) {
+                    var productSQL = this.Unit.Category.Get().Cast<object>().ToList();
+                    if (productSQL.Count > 0) {
+                        _cacheService.SetData("Category", productSQL, DateTimeOffset.Now.AddMinutes(5));
+                    }
+                }
+                return Ok(productsCache);
+            } catch {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet]
