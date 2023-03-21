@@ -25,6 +25,22 @@ namespace NewApi_app.Controllers {
             this._configuration = configuration;
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string code) {
+            if (userId == null || code == null) {
+                return BadRequest();
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) {
+                return BadRequest();
+            }
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            if (result.Succeeded)
+                return Ok();
+            else
+                return BadRequest();
+        }
 
         [HttpPost]
         [Route("login")]
@@ -71,6 +87,11 @@ namespace NewApi_app.Controllers {
 
             var res = await this._userManager.CreateAsync(user, model.Password);
             if (!res.Succeeded) { return StatusCode(StatusCodes.Status500InternalServerError, res.Errors); }
+            
+            await emailService.SendEmailAsync(model.Email, "Confirm your account",
+        $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
+
+            return Content("Для завершения регистрации проверьте электронную почту и перейдите по ссылке, указанной в письме");
 
             this.SetRole(model.UserName, UserRoles.User);
             return Ok("User added!");
