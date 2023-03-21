@@ -364,6 +364,6 @@ FodyWeavers.xsd
 
 
 # Custom
-appsettings.json
+NewApi app\appsettings.json
 
 
