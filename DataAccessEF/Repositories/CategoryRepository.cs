@@ -5,7 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
+
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +33,14 @@ namespace DataAccessEF.Repositories {
             Category category = this.Set.AsNoTracking().First(x => x.Id == entity.Id);
             category.Name = entity.Name;
             this.Context.SaveChangesAsync();
+        }
+
+        public override void Delete(Category entity) {
+            ShopContext temp = (ShopContext)(this.Context);
+            temp.CategoryConnections.Where(x => x.CategoryId == entity.Id).ToList().ForEach(x => x.CategoryId = 0);
+            
+            this.Set.Remove(entity);
+            this.Context.SaveChanges();
         }
     }
 }

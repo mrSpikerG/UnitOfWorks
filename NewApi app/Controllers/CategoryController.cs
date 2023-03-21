@@ -14,26 +14,15 @@ namespace NewApi_app.Controllers {
     public class CategoryController : Controller {
 
         private UnitOfWorks Unit;
-        private readonly ICacheService _cacheService;
-        public CategoryController(ShopContext context, ICacheService cacheService) {
+       
+        public CategoryController(ShopContext context) {
             this.Unit = new UnitOfWorks(context);
-            this._cacheService = cacheService;
+           
         }
 
         [HttpGet]
         public IActionResult Get() {
-            try {
-                List<Category> productsCache = _cacheService.GetData<List<Category>>("Category");
-                if (productsCache == null) {
-                    var productSQL = this.Unit.Category.Get().Cast<object>().ToList();
-                    if (productSQL.Count > 0) {
-                        _cacheService.SetData("Category", productSQL, DateTimeOffset.Now.AddMinutes(5));
-                    }
-                }
-                return Ok(productsCache);
-            } catch {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return Ok(this.Unit.Category.Get());
         }
 
         [HttpGet]
@@ -60,7 +49,7 @@ namespace NewApi_app.Controllers {
         public IActionResult Delete(int id) {
             try {
                 this.Unit.Category.Delete(this.Unit.Category.FindById(id));
-
+                
                 return Ok();
             }catch {
                 return StatusCode(StatusCodes.Status400BadRequest);

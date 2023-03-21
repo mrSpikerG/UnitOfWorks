@@ -1,4 +1,6 @@
 ﻿using Domain.Interfaces;
+using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,8 +27,20 @@ namespace DataAccessEF.Repositories {
             base.Delete(entity);
         }
 
-        public IEnumerable<ShopItem> GetItems(int page, int count,int categoryId, decimal minCost, decimal maxCost) {
-            int maxPages = this.GetPages(count,categoryId,minCost,maxCost)-1;
+        public IEnumerable<AdvancedShopItem> GetAdvancedItems() {
+            List<AdvancedShopItem> item = new List<AdvancedShopItem>();
+            this._context.ShopItems.ToList().ForEach(x => item
+            .Add(new AdvancedShopItem(x, 
+            this._context.Categories
+            .FirstOrDefault(category => category.Id == 
+            this._context.CategoryConnections
+            .FirstOrDefault(y => y.PhoneId == x.Id).CategoryId).Name)));
+
+            return item;
+        }
+
+        public IEnumerable<ShopItem> GetItems(int page, int count, int categoryId, decimal minCost, decimal maxCost) {
+            int maxPages = this.GetPages(count, categoryId, minCost, maxCost) - 1;
             if (page > maxPages) {
                 return null;
             }
@@ -47,11 +61,11 @@ namespace DataAccessEF.Repositories {
             List<ShopItem> paginated = new List<ShopItem>();
 
             int needToAdd = (page * count) + items;
-            
-            this._context.CategoryConnections.Where(x => x.CategoryId == categoryId).ToList().ForEach(x => {
-                var product =this.Set.FirstOrDefault(y => y.Id == x.PhoneId);
 
-                if(product.Price<=maxCost && product.Price >= minCost) {
+            this._context.CategoryConnections.Where(x => x.CategoryId == categoryId).ToList().ForEach(x => {
+                var product = this.Set.FirstOrDefault(y => y.Id == x.PhoneId);
+
+                if (product.Price <= maxCost && product.Price >= minCost) {
                     notPaginated.Add(product);
                 }
             });
@@ -71,7 +85,7 @@ namespace DataAccessEF.Repositories {
         public int GetPages(int count, int categoryId, decimal minCost, decimal maxCost) {
 
             int items = 0;
-            var phones= this._context.CategoryConnections.Where(x => x.CategoryId == categoryId);
+            var phones = this._context.CategoryConnections.Where(x => x.CategoryId == categoryId);
             phones.ToList().ForEach(x => {
                 if (this.Set.ToList().Any(y => y.Id == x.PhoneId && y.Price <= maxCost && y.Price >= minCost)) {
                     items++;

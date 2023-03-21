@@ -16,7 +16,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<ShopContext>(x => {
-    x.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConn"), b => b.MigrationsAssembly(typeof(ShopContext).Assembly.FullName));});
+    x.UseSqlServer(builder.Configuration.GetConnectionString("AzureConn"), b => b.MigrationsAssembly(typeof(ShopContext).Assembly.FullName));});
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<ShopContext>()
@@ -25,6 +25,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>()
 //          CacheService
 builder.Services.AddScoped<ICacheService, CacheService>();
 // ...
+
 
 builder.Services.AddAuthentication(options => {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

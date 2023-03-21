@@ -45,6 +45,7 @@ namespace NewApi_app.Controllers {
                 var token = AuthHelper.GetToken(authClaims, this._configuration);
 
                 return Ok(new {
+                    user.UserName,
                     Token = new JwtSecurityTokenHandler().WriteToken(token),
                     expiration = token.ValidTo
                 });

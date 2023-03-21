@@ -10,14 +10,14 @@ namespace DataAccessEF.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "CategoryConnection");
+            //migrationBuilder.DropTable(
+            //    name: "CategoryConnection");
 
-            migrationBuilder.DropTable(
-                name: "ShopItem");
+            //migrationBuilder.DropTable(
+            //    name: "ShopItem");
 
-            migrationBuilder.DropTable(
-                name: "UserInfo");
+            //migrationBuilder.DropTable(
+            //    name: "UserInfo");
 
             migrationBuilder.AddColumn<string>(
                 name: "Image",

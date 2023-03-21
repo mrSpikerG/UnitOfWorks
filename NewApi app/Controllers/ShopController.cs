@@ -14,28 +14,24 @@ namespace NewApi_app.Properties {
 
         private UnitOfWorks Unit;
         private ShopContext _context;
-        private readonly ICacheService _cacheService;
+        
         public ShopController(ShopContext context, ICacheService cacheService) {
             this.Unit = new UnitOfWorks(context);
             this._context = context;
-            this._cacheService = cacheService;
+           
         }
 
 
         [HttpGet]
         public IActionResult Get() {
-            try {
-                List<ShopItem> productsCache = _cacheService.GetData<List<ShopItem>>("ShopItem");
-                if (productsCache == null) {
-                    var productSQL = this._context.ShopItems.ToList();
-                    if (productSQL.Count > 0) {
-                        _cacheService.SetData("ShopItem", productSQL, DateTimeOffset.Now.AddMinutes(5));
-                    }
-                }
-                return Ok(productsCache);
-            } catch {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+
+            return Ok(this.Unit.Product.Get());
+        }
+
+        [HttpGet]
+        public IActionResult GetWithCategory() {
+
+            return Ok(this.Unit.Product.GetAdvancedItems());
         }
 
         [HttpGet]
