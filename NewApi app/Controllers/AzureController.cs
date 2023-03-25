@@ -7,6 +7,8 @@ using System.ComponentModel;
 using Azure.Storage.Blobs.Models;
 using System.Reflection.Metadata;
 using Domain.Models;
+using Domain;
+using Microsoft.AspNetCore.Authorization;
 
 namespace NewApi_app.Controllers {
 
@@ -22,6 +24,7 @@ namespace NewApi_app.Controllers {
 
 
         [HttpGet]
+        [Authorize(Roles = UserRoles.Manager)]
         [Route("api/getFiles")]
         public async Task<IActionResult> getFiles() {
 
@@ -40,6 +43,7 @@ namespace NewApi_app.Controllers {
         }
 
         [HttpPost]
+        [Authorize(Roles = UserRoles.Manager)]
         [Route("api/saveImage")]
         public async Task<IActionResult> saveImage(IFormFile file) {
             if (file.Length > 0) {

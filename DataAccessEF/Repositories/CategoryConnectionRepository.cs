@@ -11,10 +11,9 @@ namespace DataAccessEF.Repositories {
         }
 
         public int GetCategoryByProduct(int id) {
-            if (this.Set.FirstOrDefault(x => x.PhoneId == id) == null) {
-                return 2;
-            }
             return this.Set.FirstOrDefault(x => x.PhoneId == id).CategoryId ;
         }
+
+
     }
 }

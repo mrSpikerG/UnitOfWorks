@@ -39,6 +39,16 @@ namespace DataAccessEF.Repositories {
             return item;
         }
 
+        public override void Update(ShopItem entity) {
+            ShopItem item = this._context.ShopItems.FirstOrDefault(x => x.Id == entity.Id);
+            item.Name = entity.Name;
+            item.Image = entity.Image;
+            item.Price = entity.Price;
+            this._context.SaveChanges();
+        }
+
+
+        [Obsolete("This method is deprecated, please use GetAdvancedItems instead.")]
         public IEnumerable<ShopItem> GetItems(int page, int count, int categoryId, decimal minCost, decimal maxCost) {
             int maxPages = this.GetPages(count, categoryId, minCost, maxCost) - 1;
             if (page > maxPages) {
@@ -82,6 +92,7 @@ namespace DataAccessEF.Repositories {
             return this.Set.ToList().Last(x => x.Name.Equals(name)).Id;
         }
 
+        [Obsolete("This method is deprecated, please use GetAdvancedItems instead.")]
         public int GetPages(int count, int categoryId, decimal minCost, decimal maxCost) {
 
             int items = 0;

@@ -26,8 +26,9 @@ namespace NewApi_app.Controllers {
         }
 
         [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail(string userId, string code) {
+        [Route("confirmEmail")]
+        public async Task<IActionResult> ConfirmEmail(string userId, string codeRaw) {
+            string code = codeRaw.Replace(" ", "+"); // :3
             if (userId == null || code == null) {
                 return BadRequest();
             }
@@ -42,12 +43,77 @@ namespace NewApi_app.Controllers {
                 return BadRequest();
         }
 
+
+        [HttpGet]
+        [Route("tryConfirmEmail")]
+        public async Task<IActionResult> SendConfirmEmail([FromQuery] string userName) {
+            var user = await this._userManager.FindByNameAsync(userName);
+   
+            if (user != null) {
+                MailHelper helper = new MailHelper();
+
+                var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                var callbackUrl = $"{ConfigurationManager.AppSetting["BaseURI"]}/api/Auth/ConfirmEmail/confirmEmail?userId={user.Id}&codeRaw={code}";
+                    
+                await helper.SendEmailAsync(user.Email, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>Клик</a>");
+                return Ok();
+            }
+            return BadRequest();
+        }
+
+        [HttpGet]
+        [Route("confirmPassword")]
+        public async Task<IActionResult> ConfirmPassword(string userId, string codeRaw,string password) {
+            string code = codeRaw.Replace(" ", "+"); // :3
+            if (userId == null || code == null) {
+                return BadRequest();
+            }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) {
+                return BadRequest();
+            }
+            var result = await _userManager.ResetPasswordAsync(user, code,password);
+            if (result.Succeeded)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost]
+        [Route("forgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromQuery] string userName, [FromQuery] string newPassword) {
+            var user = await this._userManager.FindByNameAsync(userName);
+
+            if (user != null) {
+
+                if (!await _userManager.IsEmailConfirmedAsync(user)) {
+                    return BadRequest("You are not confirmed mail");
+                }
+
+
+                MailHelper helper = new MailHelper();
+
+                var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+                var callbackUrl = $"{ConfigurationManager.AppSetting["BaseURI"]}/api/Auth/ConfirmPassword/confirmPassword?userId={user.Id}&codeRaw={code}&password={newPassword}";
+
+                await helper.SendEmailAsync(user.Email, "Password reset", $"Только что вы пытались сменить пароль на нашем сайте.<br> Подтвердите это, перейдя по этой ссылке: <a href='{callbackUrl}'>Клик</a><br> Если вы не запрашивали смену пароля, то не обращайте внимание на данное письмо");
+                return Ok();
+            }
+            return BadRequest();
+        }
+
         [HttpPost]
         [Route("login")]
         public async Task<IActionResult> Login([FromQuery] Login model) {
             var user = await this._userManager.FindByNameAsync(model.UserName);
-            var d = this._userManager.CheckPasswordAsync(user, model.Password);
             if (user != null && await this._userManager.CheckPasswordAsync(user, model.Password)) {
+
+
+          
+                if (!await _userManager.IsEmailConfirmedAsync(user)) {
+                    return BadRequest("You are not confirmed mail");
+                }
+
                 var userRole = await this._userManager.GetRolesAsync(user);
                 var authClaims = new List<Claim> {
                     new Claim(ClaimTypes.Name, user.UserName),
@@ -87,14 +153,21 @@ namespace NewApi_app.Controllers {
 
             var res = await this._userManager.CreateAsync(user, model.Password);
             if (!res.Succeeded) { return StatusCode(StatusCodes.Status500InternalServerError, res.Errors); }
-            
-            await emailService.SendEmailAsync(model.Email, "Confirm your account",
-        $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
+            this.SetRole(model.UserName, UserRoles.User);
+
+
+            // Gmail
+            MailHelper helper = new MailHelper();
+
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var callbackUrl = Url.Action(
+                "ConfirmEmail",
+                "Account",
+                new { userId = user.Id, code = code },
+                protocol: HttpContext.Request.Scheme);
+            await helper.SendEmailAsync(model.Email, "Confirm your account", $"Подтвердите регистрацию, перейдя по ссылке: <a href='{callbackUrl}'>link</a>");
 
             return Content("Для завершения регистрации проверьте электронную почту и перейдите по ссылке, указанной в письме");
-
-            this.SetRole(model.UserName, UserRoles.User);
-            return Ok("User added!");
         }
 
         [HttpPost]

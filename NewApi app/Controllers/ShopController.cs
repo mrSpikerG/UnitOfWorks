@@ -98,6 +98,18 @@ namespace NewApi_app.Properties {
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Manager)]
+        public IActionResult UpdateWithCategory([FromQuery]ShopItem item,int categoryId) {
+            if (item.Price < 1) {
+                return BadRequest();
+            }
+            this.Unit.Product.Update(item);
+            this._context.CategoryConnections.FirstOrDefault(x => x.PhoneId == item.Id).CategoryId = categoryId;
+            this._context.SaveChanges();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = UserRoles.Manager)]
         public IActionResult Delete(int id) {
             this.Unit.Product.Delete(this.Unit.Product.FindById(id));
             return Ok();
