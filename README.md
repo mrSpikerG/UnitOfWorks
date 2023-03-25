@@ -2,7 +2,7 @@
 
 This project needs just for study
 
-## Доступные скрипты
+## Installation
 
 
 For installation you must create appsettings.json 
