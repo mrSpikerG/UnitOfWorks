@@ -15,7 +15,7 @@ namespace NewApi_app.Properties {
         private UnitOfWorks Unit;
         private ShopContext _context;
         
-        public ShopController(ShopContext context, ICacheService cacheService) {
+        public ShopController(ShopContext context) {
             this.Unit = new UnitOfWorks(context);
             this._context = context;
            

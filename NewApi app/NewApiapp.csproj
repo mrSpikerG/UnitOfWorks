@@ -8,6 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.Core" Version="3.7.106.39" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.104.19" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.15.0" />
     <PackageReference Include="MailKit" Version="3.6.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.10" />

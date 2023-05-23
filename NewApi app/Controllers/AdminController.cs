@@ -2,12 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Domain.Models;
 
 namespace NewApi_app.Controllers {
 
     [ApiController]
     [Route("api/admin/[controller]/[action]")]
-    public class AdminController : Controller{
+    public class AdminController : Controller {
 
         private readonly IConfiguration _configuration;
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -20,16 +21,32 @@ namespace NewApi_app.Controllers {
         }
 
         [HttpGet]
-        [Authorize(Roles =UserRoles.Admin)]
-        public async Task<IActionResult> GetUsersByRole (string role) {
-            if (role == UserRoles.Admin || role == UserRoles.Manager) {
-                var list = await this._userManager.GetUsersInRoleAsync(role);
-                return Ok(list);
+        [Route("GetUsersWithRole")]
+        [Authorize(Roles = UserRoles.Admin)]
+        public async Task<IActionResult> GetUsersWithRole() {
+
+            List<UserInfo> userInfos = new List<UserInfo>();
+            foreach (var role in this._roleManager.Roles.ToList()) {
+                if (role.Name != "User") {
+                    var list = await this._userManager.GetUsersInRoleAsync(role.Name);
+                    foreach (var user in list) {
+                        if (!userInfos.Any(x => x.Name.Equals(user.UserName))) {
+                            userInfos.Add(new UserInfo(user.UserName, user.Email, await this._userManager.GetRolesAsync(user)));
+                        }
+                    }
+                }
             }
-            return StatusCode(StatusCodes.Status400BadRequest);
+
+
+            return Ok(userInfos);
         }
 
-       
+        [Route("acl/getRoles")]
+        [Authorize(Roles = UserRoles.Admin)]
+        [HttpGet]
+        public async Task<IActionResult> GetAllRoles() {
+            return Ok(this._roleManager.Roles);
+        }
 
         [HttpPost]
         [Route("removeAdmin")]
@@ -50,7 +67,7 @@ namespace NewApi_app.Controllers {
 
 
                 if (await this._roleManager.RoleExistsAsync(role)) {
-                    if(await this._userManager.IsInRoleAsync(user, role)){
+                    if (await this._userManager.IsInRoleAsync(user, role)) {
                         await this._userManager.RemoveFromRoleAsync(user, role);
                     }
                 }

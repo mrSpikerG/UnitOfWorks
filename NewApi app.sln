@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NewApi app", "NewApi app\NewApi app.csproj", "{F8258B1C-1642-40A2-8600-9975B33E65CA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NewApiapp", "NewApi app\NewApiapp.csproj", "{F8258B1C-1642-40A2-8600-9975B33E65CA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{74F0E9B5-5585-4B91-A921-ED6B902BD113}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "Domain\Domain.csproj", "{74F0E9B5-5585-4B91-A921-ED6B902BD113}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccessEF", "DataAccessEF\DataAccessEF.csproj", "{10E7444B-FCB3-418F-BC83-46CF527E2460}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccessEF", "DataAccessEF\DataAccessEF.csproj", "{10E7444B-FCB3-418F-BC83-46CF527E2460}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -38,7 +38,7 @@ namespace NewApi_app.Controllers {
             }
             var result = await _userManager.ConfirmEmailAsync(user, code);
             if (result.Succeeded)
-                return Ok();
+                return Redirect($"{ConfigurationManager.AppSetting["FrontURI"]}");
             else
                 return BadRequest();
         }
@@ -74,7 +74,8 @@ namespace NewApi_app.Controllers {
             }
             var result = await _userManager.ResetPasswordAsync(user, code,password);
             if (result.Succeeded)
-                return Ok();
+                return Redirect($"{ConfigurationManager.AppSetting["FrontURI"]}");
+          
             else
                 return BadRequest();
         }
@@ -196,22 +197,26 @@ namespace NewApi_app.Controllers {
             return StatusCode(404);
         }
 
-
         [HttpPost]
-        [Route("checkManagerAccess")]
-        [Authorize(Roles = UserRoles.Manager)]
-        public async Task<IActionResult> CheckManagerAccess() {
-            return Ok();
+        [Route("checkAccess")]
+        public IActionResult CheckAccess(string role) {
+             if(HttpContext.User.IsInRole(role)) {
+                return Ok();
+            }
+            
+            return Unauthorized();
         }
 
-
         [HttpPost]
-        [Route("checkAdminAccess")]
-        [Authorize(Roles = UserRoles.Admin)]
-        public async Task<IActionResult> CheckAdminAccess() {
-            return Ok();
-        }
+        [Route("checkDashboardAccess")]
+        public IActionResult checkDashboardAccess() {
+            
+            
+            if (HttpContext.User.IsInRole(UserRoles.Admin) || HttpContext.User.IsInRole(UserRoles.Manager)) {
+                return Ok();
+            }
 
-        
+            return Unauthorized();
+        }
     }
 }
