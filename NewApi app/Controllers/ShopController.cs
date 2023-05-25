@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Data;
 using Microsoft.EntityFrameworkCore;
 using NewApi_app.Cache;
+using System.Collections.Generic;
 
 namespace NewApi_app.Properties {
 
@@ -14,18 +15,29 @@ namespace NewApi_app.Properties {
 
         private UnitOfWorks Unit;
         private ShopContext _context;
-        
-        public ShopController(ShopContext context) {
+        private readonly ICacheService _cacheService;
+
+        public ShopController(ShopContext context, ICacheService cacheService) {
             this.Unit = new UnitOfWorks(context);
             this._context = context;
-           
+            this._cacheService = cacheService;
         }
 
 
         [HttpGet]
         public IActionResult Get() {
+            try {
+                List<ShopItem> productsCache = _cacheService.GetData<List<ShopItem>>("ShopItem");
+                if (productsCache == null) {
+                    var productSQL = this.Unit.Product.Get();
 
-            return Ok(this.Unit.Product.Get());
+                    _cacheService.SetData("ShopItem", productSQL, DateTimeOffset.Now.AddHours(6));
+                    return Ok(productSQL);
+                }
+                return Ok(productsCache);
+            } catch {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
         }
 
         [HttpGet]
@@ -33,6 +45,14 @@ namespace NewApi_app.Properties {
 
             return Ok(this.Unit.Product.GetAdvancedItems());
         }
+
+        [HttpGet]
+        public IActionResult GetLastProducts() {
+
+            List<ShopItem> list = (List<ShopItem>)this.Unit.Product.Get();
+            return Ok(list.TakeLast(4));
+        }
+
 
         [HttpGet]
         public IActionResult GetCategory(int id) {
@@ -83,6 +103,8 @@ namespace NewApi_app.Properties {
                 }
                 this.Unit.Product.Insert(new ShopItem() { Name = name, Image = image, Price = price });
                 this.Unit.CategoryConnection.Insert(new CategoryConnection() { PhoneId = this.Unit.Product.GetLastByName(name), CategoryId = categoryId });
+
+                _cacheService.SetData("ShopItem", this.Unit.Product.Get(), DateTimeOffset.Now.AddHours(6));
                 return Ok();
             } catch {
                 return StatusCode(StatusCodes.Status400BadRequest);
@@ -93,18 +115,20 @@ namespace NewApi_app.Properties {
         [Authorize(Roles = UserRoles.Manager)]
         public IActionResult Update(ShopItem item) {
             this.Unit.Product.Update(item);
+            _cacheService.SetData("ShopItem", this.Unit.Product.Get(), DateTimeOffset.Now.AddHours(6));
             return Ok();
         }
 
         [HttpPost]
         [Authorize(Roles = UserRoles.Manager)]
-        public IActionResult UpdateWithCategory([FromQuery]ShopItem item,int categoryId) {
+        public IActionResult UpdateWithCategory([FromQuery] ShopItem item, int categoryId) {
             if (item.Price < 1) {
                 return BadRequest();
             }
             this.Unit.Product.Update(item);
             this._context.CategoryConnections.FirstOrDefault(x => x.PhoneId == item.Id).CategoryId = categoryId;
             this._context.SaveChanges();
+            _cacheService.SetData("ShopItem", this.Unit.Product.Get(), DateTimeOffset.Now.AddHours(6));
             return Ok();
         }
 
@@ -112,6 +136,7 @@ namespace NewApi_app.Properties {
         [Authorize(Roles = UserRoles.Manager)]
         public IActionResult Delete(int id) {
             this.Unit.Product.Delete(this.Unit.Product.FindById(id));
+            _cacheService.SetData("ShopItem", this.Unit.Product.Get(), DateTimeOffset.Now.AddHours(6));
             return Ok();
         }
 
